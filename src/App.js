@@ -12,6 +12,7 @@ class App extends Component {
     }
 
     this.getFeedList();
+    this.searchByInput = this.searchByInput.bind(this);
   }
 
   async getFeedList(query = "") {
