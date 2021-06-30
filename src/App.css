@@ -2,3 +2,10 @@ body {
   background-color: #282c34;
   color: white;
 }
+
+.screen-centered {
+  position: fixed;
+  left: auto;
+  top: 50%;
+  z-index: 9999;
+}

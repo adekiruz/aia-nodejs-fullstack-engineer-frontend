@@ -1,20 +1,21 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { Component } from 'react';
-import { Button, Container, Row, Col, Form, Card } from 'react-bootstrap';
+import { Button, Container, Row, Col, Form, Card, Spinner } from 'react-bootstrap';
 
 class App extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      query: "", title: "", feedList: []
+      query: "", title: "", feedList: [], isLoading: true
     }
 
     this.getFeedList();
   }
 
   async getFeedList(query = "") {
+    this.setState({ isLoading: true });
     let feedURL = new URL('http://localhost:32855/flickr-photos-feed');
 
     if (query) {
@@ -26,6 +27,7 @@ class App extends Component {
     const body = await response.json();
 
     this.setState({ title: body.title, feedList: body.items })
+    this.setState({ isLoading: false });
   }
 
   itemCard(item) {
@@ -51,7 +53,7 @@ class App extends Component {
   }
 
   render() {
-    const { title, query, feedList } = this.state;
+    const { title, query, feedList, isLoading } = this.state;
 
     return (
       <Container className="mb-5">
@@ -82,7 +84,7 @@ class App extends Component {
         </Row>
         <Row>
           <Col md={12} className="d-flex justify-content-center">
-            {feedList.length === 0
+            {isLoading ? <Spinner animation="border" variant="danger" className="screen-centered" /> : feedList.length === 0
               ? <h2 className="screen-centered"><i>No results</i></h2>
               : <div> {feedList.map((item, i) => (
                 <div key={i}>{this.itemCard(item)}</div>
