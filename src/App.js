@@ -29,6 +29,7 @@ class App extends Component {
   }
 
   itemCard(item) {
+    const formatDate = s => new Date(s).toLocaleDateString(undefined, { dateStyle: 'long' });
     const getAuthorName = author => {
       var regex = /(?<=")(.*?)(?=")/;
       var matched = regex.exec(author);
@@ -43,7 +44,7 @@ class App extends Component {
           <Card.Subtitle>Posted by <a target="__blank" href={`https://www.flickr.com/people/${item.author_id}`}>{getAuthorName(item.author)}</a></Card.Subtitle>
         </Card.Body>
         <Card.Footer className="text-right">
-          {item.published}
+          {formatDate(item.published)}
         </Card.Footer>
       </Card>
     );
