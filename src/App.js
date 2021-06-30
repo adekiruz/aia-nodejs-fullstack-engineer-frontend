@@ -21,21 +21,26 @@ class App extends Component {
   }
 
   async getFeedList(query = "") {
-    this.setState({ isLoading: true, feedList: [], paginatedFeedList: [] });
-    let feedURL = new URL('http://localhost:32855/flickr-photos-feed');
+    try {
+      this.setState({ isLoading: true, feedList: [], paginatedFeedList: [] });
+      let feedURL = new URL('http://localhost:32855/flickr-photos-feed');
 
-    if (query) {
-      query = query.replace(/\s/g, ',')
-      feedURL.searchParams.append('tags', query);
+      if (query) {
+        query = query.replace(/\s/g, ',')
+        feedURL.searchParams.append('tags', query);
+      }
+
+      const response = await fetch(feedURL);
+      const body = await response.json();
+
+      const { currentPage, perPage } = this.state;
+
+      const paginatedFeedList = this.paginatingFeed(body.items, currentPage, perPage);
+      this.setState({ title: body.title, feedList: body.items, paginatedFeedList, totalPage: Math.ceil(body.items.length / perPage), isLoading: false })
+    } catch (e) {
+      console.log('--- error', e)
+      this.setState({ isLoading: false });
     }
-
-    const response = await fetch(feedURL);
-    const body = await response.json();
-
-    const { currentPage, perPage } = this.state;
-    
-    const paginatedFeedList = this.paginatingFeed(body.items, currentPage, perPage);
-    this.setState({ title: body.title, feedList: body.items, paginatedFeedList, totalPage: Math.ceil(body.items.length / perPage), isLoading: false })
   }
 
   searchByInput(e) {
