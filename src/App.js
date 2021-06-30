@@ -11,10 +11,13 @@ class App extends Component {
       query: "", title: "", feedList: [], isLoading: true, paginatedFeedList: [], currentPage: 1, perPage: 4, totalPage: 0
     }
 
-    this.getFeedList();
     this.searchByInput = this.searchByInput.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
     this.handleNext = this.handleNext.bind(this);
+  }
+
+  componentDidMount() {
+    this.getFeedList();
   }
 
   async getFeedList(query = "") {
@@ -22,7 +25,7 @@ class App extends Component {
     let feedURL = new URL('http://localhost:32855/flickr-photos-feed');
 
     if (query) {
-      query = query.replaceAll(' ', ',')
+      query = query.replace(/\s/g, ',')
       feedURL.searchParams.append('tags', query);
     }
 
@@ -111,17 +114,17 @@ class App extends Component {
           <Col md={6}><h1>FLICKR PHOTOS FEED</h1></Col>
           <Col md={6} className="d-flex justify-content-end">
             <Form inline onSubmit={this.searchByInput}>
-              <Form.Label htmlFor="tags" srOnly>
+              <Form.Label htmlFor="search-input" srOnly>
                 Search with tags
               </Form.Label>
               <Form.Control
+                id="search-input"
                 className="mb-2 mr-sm-2"
-                id="tags"
                 placeholder="Search with tags..."
                 value={query}
                 onChange={e => this.setState({ query: e.target.value })}
               />
-              <Button type="submit" className="mb-2">
+              <Button id="search-button" type="submit" className="mb-2">
                 Go!
               </Button>
             </Form>
@@ -134,8 +137,8 @@ class App extends Component {
         </Row>
         <Row>
           <Col md={12} className="d-flex justify-content-center">
-            {isLoading ? <Spinner role="loading-spinner" animation="border" variant="danger" className="screen-centered" /> : paginatedFeedList.length === 0
-              ? <h2 className="screen-centered"><i>No results</i></h2>
+            {isLoading ? <Spinner id="loading-spinner" animation="border" variant="danger" className="screen-centered" /> : paginatedFeedList.length === 0
+              ? <h2 className="screen-centered"><i id="no-result-message">No results</i></h2>
               : <div> {paginatedFeedList.map((item, i) => (
                 <div key={i}>{this.itemCard(item)}</div>
               ))} </div>
