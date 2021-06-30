@@ -30,6 +30,12 @@ class App extends Component {
     this.setState({ isLoading: false });
   }
 
+  searchByInput(e) {
+    e.preventDefault();
+
+    this.getFeedList(this.state.query);
+  }
+
   itemCard(item) {
     const formatDate = s => new Date(s).toLocaleDateString(undefined, { dateStyle: 'long' });
     const getAuthorName = author => {
