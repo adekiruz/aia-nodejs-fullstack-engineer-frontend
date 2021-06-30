@@ -37,10 +37,10 @@ class App extends Component {
     };
     return (
       <Card bg="secondary" border="dark" style={{ width: "100%" }} className="mb-4">
-        <Card.Img variant="top" src={item.media.m} />
+        <a target="__blank" href={item.link}><Card.Img variant="top" src={item.media.m} /></a>
         <Card.Body className="p-2">
           <Card.Title className="mb-4">{item.title}</Card.Title>
-          <Card.Subtitle>Posted by {getAuthorName(item.author)}</Card.Subtitle>
+          <Card.Subtitle>Posted by <a target="__blank" href={`https://www.flickr.com/people/${item.author_id}`}>{getAuthorName(item.author)}</a></Card.Subtitle>
         </Card.Body>
         <Card.Footer className="text-right">
           {item.published}
