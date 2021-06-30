@@ -1,5 +1,5 @@
-import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 import { Component } from 'react';
 import { Button, Container, Row, Col, Form, Card } from 'react-bootstrap';
 
