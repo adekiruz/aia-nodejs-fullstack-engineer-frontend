@@ -1,8 +1,15 @@
-import { render, screen } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
+
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('show loading spinner when user search', async () => {
+  const dom = render(<App />);
+
+  const searchButton = dom.container.querySelector('#search-button');
+  const loadingSpinner = dom.container.querySelector('#loading-spinner')
+
+  fireEvent.click(searchButton);
+  await waitFor(() => loadingSpinner);
+
+  expect(loadingSpinner).toBeInTheDocument();
 });
