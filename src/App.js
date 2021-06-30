@@ -8,15 +8,17 @@ class App extends Component {
     super(props)
 
     this.state = {
-      query: "", title: "", feedList: [], isLoading: true
+      query: "", title: "", feedList: [], isLoading: true, paginatedFeedList: [], currentPage: 1, perPage: 4, totalPage: 0
     }
 
     this.getFeedList();
     this.searchByInput = this.searchByInput.bind(this);
+    this.handlePrev = this.handlePrev.bind(this);
+    this.handleNext = this.handleNext.bind(this);
   }
 
   async getFeedList(query = "") {
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, feedList: [], paginatedFeedList: [] });
     let feedURL = new URL('http://localhost:32855/flickr-photos-feed');
 
     if (query) {
@@ -27,8 +29,10 @@ class App extends Component {
     const response = await fetch(feedURL);
     const body = await response.json();
 
-    this.setState({ title: body.title, feedList: body.items })
-    this.setState({ isLoading: false });
+    const { currentPage, perPage } = this.state;
+    
+    const paginatedFeedList = this.paginatingFeed(body.items, currentPage, perPage);
+    this.setState({ title: body.title, feedList: body.items, paginatedFeedList, totalPage: Math.ceil(body.items.length / perPage), isLoading: false })
   }
 
   searchByInput(e) {
@@ -39,6 +43,28 @@ class App extends Component {
 
   searchByTag(tag) {
     this.getFeedList(tag);
+  }
+
+  paginatingFeed(source, currentPage, perPage) {
+    return source.slice((currentPage * perPage) - perPage, (currentPage * perPage));
+  }
+
+  handlePrev() {
+    const { feedList, currentPage, perPage } = this.state;
+    window.scrollTo(0, 0);
+
+    const decrementCurrentPage = currentPage - 1;
+    const paginatedFeedList = this.paginatingFeed(feedList, decrementCurrentPage, perPage);
+    this.setState({ paginatedFeedList, currentPage: decrementCurrentPage })
+  }
+
+  handleNext() {
+    const { feedList, currentPage, perPage } = this.state;
+    window.scrollTo(0, 0);
+
+    const incrementCurrentPage = currentPage + 1;
+    const paginatedFeedList = this.paginatingFeed(feedList, incrementCurrentPage, perPage);
+    this.setState({ paginatedFeedList, currentPage: incrementCurrentPage })
   }
 
   itemCard(item) {
@@ -77,7 +103,7 @@ class App extends Component {
   }
 
   render() {
-    const { title, query, feedList, isLoading } = this.state;
+    const { title, query, feedList, paginatedFeedList, isLoading, currentPage, perPage, totalPage } = this.state;
 
     return (
       <Container className="mb-5">
@@ -108,14 +134,24 @@ class App extends Component {
         </Row>
         <Row>
           <Col md={12} className="d-flex justify-content-center">
-            {isLoading ? <Spinner animation="border" variant="danger" className="screen-centered" /> : feedList.length === 0
+            {isLoading ? <Spinner role="loading-spinner" animation="border" variant="danger" className="screen-centered" /> : paginatedFeedList.length === 0
               ? <h2 className="screen-centered"><i>No results</i></h2>
-              : <div> {feedList.map((item, i) => (
+              : <div> {paginatedFeedList.map((item, i) => (
                 <div key={i}>{this.itemCard(item)}</div>
               ))} </div>
             }
           </Col>
         </Row>
+
+        {feedList.length > perPage && (
+          <Row>
+            <Col className="d-flex justify-content-between">
+              <Button disabled={currentPage <= 1} style={{ width: '5rem' }} onClick={this.handlePrev} >prev</Button>
+              <div>Page {currentPage} </div>
+              <Button disabled={currentPage >= totalPage} style={{ width: '5rem' }} onClick={this.handleNext}>next</Button>
+            </Col>
+          </Row>
+        )}
       </Container>
     );
   }
