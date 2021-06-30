@@ -1,8 +1,7 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import { Component } from 'react';
-import { Button, Container, Row, Col, Form } from 'react-bootstrap';
+import { Button, Container, Row, Col, Form, Card } from 'react-bootstrap';
 
 class App extends Component {
   constructor(props) {
@@ -11,11 +10,48 @@ class App extends Component {
     this.state = {
       query: "", title: "", feedList: []
     }
+
+    this.getFeedList();
   }
-   
+
+  async getFeedList(query = "") {
+    let feedURL = new URL('http://localhost:32855/flickr-photos-feed');
+
+    if (query) {
+      query = query.replaceAll(' ', ',')
+      feedURL.searchParams.append('tags', query);
+    }
+
+    const response = await fetch(feedURL);
+    const body = await response.json();
+
+    this.setState({ title: body.title, feedList: body.items })
+  }
+
+  itemCard(item) {
+    const getAuthorName = author => {
+      var regex = /(?<=")(.*?)(?=")/;
+      var matched = regex.exec(author);
+
+      return matched.length ? matched[0] : author;
+    };
+    return (
+      <Card bg="secondary" border="dark" style={{ width: "100%" }} className="mb-4">
+        <Card.Img variant="top" src={item.media.m} />
+        <Card.Body className="p-2">
+          <Card.Title className="mb-4">{item.title}</Card.Title>
+          <Card.Subtitle>Posted by {getAuthorName(item.author)}</Card.Subtitle>
+        </Card.Body>
+        <Card.Footer className="text-right">
+          {item.published}
+        </Card.Footer>
+      </Card>
+    );
+  }
+
   render() {
-    const { title, query } = this.state;
-    
+    const { title, query, feedList } = this.state;
+
     return (
       <Container className="mb-5">
         <Row>
@@ -41,6 +77,16 @@ class App extends Component {
         <Row>
           <Col md={12} className="d-flex justify-content-start">
             <h5 className="mt-3 mb-3">{title && `${title}:`}</h5>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12} className="d-flex justify-content-center">
+            {feedList.length === 0
+              ? <h2 className="screen-centered"><i>No results</i></h2>
+              : <div> {feedList.map((item, i) => (
+                <div key={i}>{this.itemCard(item)}</div>
+              ))} </div>
+            }
           </Col>
         </Row>
       </Container>
