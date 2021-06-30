@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { Component } from 'react';
-import { Button, Container, Row, Col, Form, Card, Spinner } from 'react-bootstrap';
+import { Button, Container, Row, Col, Form, Card, Spinner, Badge } from 'react-bootstrap';
 
 class App extends Component {
   constructor(props) {
@@ -37,6 +37,10 @@ class App extends Component {
     this.getFeedList(this.state.query);
   }
 
+  searchByTag(tag) {
+    this.getFeedList(tag);
+  }
+
   itemCard(item) {
     const formatDate = s => new Date(s).toLocaleDateString(undefined, { dateStyle: 'long' });
     const getAuthorName = author => {
@@ -51,6 +55,19 @@ class App extends Component {
         <Card.Body className="p-2">
           <Card.Title className="mb-4">{item.title}</Card.Title>
           <Card.Subtitle>Posted by <a target="__blank" href={`https://www.flickr.com/people/${item.author_id}`}>{getAuthorName(item.author)}</a></Card.Subtitle>
+          <Card.Subtitle className="mt-4">
+            <div className="mb-2">Tags:</div>
+            <div>
+              {(item.tags.split(' ')).map((tag, i) => {
+                return (
+                  <Badge key={tag + i} style={{ cursor: "pointer" }} variant="danger" className="mr-2 mb-1 p-1" onClick={(e) => {
+                    this.setState({ query: tag });
+                    this.searchByTag(tag)
+                  }}>{tag}</Badge>
+                );
+              })}
+            </div>
+          </Card.Subtitle>
         </Card.Body>
         <Card.Footer className="text-right">
           {formatDate(item.published)}
