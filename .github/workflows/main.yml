@@ -1,0 +1,41 @@
+name: Deploy to server
+
+on:
+  push:
+    branches: [ master ]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run the tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+      
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -avhzr --exclude=".git" --exclude=".github" --exclude="node_modules"
+          remote_path: /home/jamhari/projects/aia-nodejs-fullstack-engineer-frontend/
+          remote_host: 62.171.152.157
+          remote_port: 32780
+          remote_user: jamhari
+          remote_key: ${{ secrets.SERVER_KEY }}
