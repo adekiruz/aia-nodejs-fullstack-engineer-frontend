@@ -9,3 +9,12 @@ body {
   top: 50%;
   z-index: 9999;
 }
+
+.card {
+  color: white;
+}
+
+.card a {
+  color: unset;
+  font-style: italic;
+}
